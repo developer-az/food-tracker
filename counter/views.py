@@ -164,7 +164,6 @@ def quick_log(request):
     return render(request, 'quick_log.html', {'form': form})
 
 
-@login_required
 def food_search_api(request):
     """API endpoint for food search (used by quick log autocomplete)"""
     query = request.GET.get('q', '')
