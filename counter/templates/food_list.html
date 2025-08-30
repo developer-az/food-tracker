@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Foods Database - Food Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-list-ul"></i> Foods Database</h1>
+    <a href="{% url 'add_food' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add New Food
+    </a>
+</div>
+
+<!-- Search Bar -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control" placeholder="Search foods..." 
+                   value="{{ search_query }}" autocomplete="off">
+            <button type="submit" class="btn btn-outline-primary ms-2">
+                <i class="bi bi-search"></i> Search
+            </button>
+            {% if search_query %}
+                <a href="{% url 'food_list' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="col-lg-4">
+        <div class="text-end">
+            <span class="badge bg-primary fs-6">{{ foods.count }} food{{ foods.count|pluralize }} found</span>
+        </div>
+    </div>
+</div>
+
+{% if search_query %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Showing results for "<strong>{{ search_query }}</strong>"
+    </div>
+{% endif %}
+
+<!-- Foods List -->
+<div class="row">
+    {% if foods %}
+        {% for food in foods %}
+            <div class="col-lg-6 col-xl-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ food.name }}</h5>
+                        {% if food.description %}
+                            <p class="card-text text-muted">{{ food.description|truncatewords:15 }}</p>
+                        {% endif %}
+                        
+                        <!-- Nutrition Info per 100g -->
+                        <div class="nutrition-info">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded mb-2">
+                                        <strong class="text-primary">{{ food.calories_per_100g|floatformat:0 }}</strong><br>
+                                        <small class="text-muted">calories</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded mb-2">
+                                        <strong class="text-success">{{ food.protein_per_100g|floatformat:1 }}g</strong><br>
+                                        <small class="text-muted">protein</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded mb-2">
+                                        <strong class="text-warning">{{ food.carbs_per_100g|floatformat:1 }}g</strong><br>
+                                        <small class="text-muted">carbs</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded mb-2">
+                                        <strong class="text-info">{{ food.fat_per_100g|floatformat:1 }}g</strong><br>
+                                        <small class="text-muted">fat</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <div class="row">
+                            <div class="col-12">
+                                <small class="text-muted">
+                                    <i class="bi bi-rulers"></i> Serving size: {{ food.serving_size_g }}g 
+                                    ({{ food.calories_per_serving|floatformat:0 }} cal)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-grid">
+                            <form method="get" action="{% url 'log_food' %}">
+                                <input type="hidden" name="food_id" value="{{ food.id }}">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Log This Food
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                {% if search_query %}
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h3 class="mt-3">No foods found</h3>
+                    <p class="text-muted">No foods match your search "{{ search_query }}". Try a different search term or add the food yourself!</p>
+                    <a href="{% url 'add_food' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Add "{{ search_query }}" as New Food
+                    </a>
+                {% else %}
+                    <i class="bi bi-basket display-1 text-muted"></i>
+                    <h3 class="mt-3">No foods in database</h3>
+                    <p class="text-muted">Be the first to add foods to the database!</p>
+                    <a href="{% url 'add_food' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Add First Food
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Pagination would go here if we implement it -->
+
+<!-- Help Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightbulb"></i> Tips for Using the Food Database</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li><strong>Search:</strong> Use the search bar to find specific foods quickly</li>
+                            <li><strong>Nutrition info:</strong> All values are shown per 100g for easy comparison</li>
+                            <li><strong>Serving sizes:</strong> Common serving sizes are provided for reference</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li><strong>Missing food?</strong> Add it using the "Add New Food" button</li>
+                            <li><strong>Quick logging:</strong> Click "Log This Food" to add it to your daily intake</li>
+                            <li><strong>Accuracy:</strong> Double-check nutrition values when adding new foods</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

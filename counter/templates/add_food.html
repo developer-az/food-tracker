@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Food - Food Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-plus-circle"></i> Add New Food</h3>
+                <p class="mb-0">Add a new food item to the database with nutritional information</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Food Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    <h5><i class="bi bi-graph-up"></i> Nutritional Information (per 100g)</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.calories_per_100g.id_for_label }}" class="form-label">
+                                <i class="bi bi-fire text-danger"></i> Calories *
+                            </label>
+                            {{ form.calories_per_100g }}
+                            {% if form.calories_per_100g.errors %}
+                                <div class="text-danger">{{ form.calories_per_100g.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.protein_per_100g.id_for_label }}" class="form-label">
+                                <i class="bi bi-heart text-success"></i> Protein (g)
+                            </label>
+                            {{ form.protein_per_100g }}
+                            {% if form.protein_per_100g.errors %}
+                                <div class="text-danger">{{ form.protein_per_100g.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.carbs_per_100g.id_for_label }}" class="form-label">
+                                <i class="bi bi-lightning text-warning"></i> Carbohydrates (g)
+                            </label>
+                            {{ form.carbs_per_100g }}
+                            {% if form.carbs_per_100g.errors %}
+                                <div class="text-danger">{{ form.carbs_per_100g.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fat_per_100g.id_for_label }}" class="form-label">
+                                <i class="bi bi-droplet text-info"></i> Fat (g)
+                            </label>
+                            {{ form.fat_per_100g }}
+                            {% if form.fat_per_100g.errors %}
+                                <div class="text-danger">{{ form.fat_per_100g.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fiber_per_100g.id_for_label }}" class="form-label">
+                                <i class="bi bi-tree text-secondary"></i> Fiber (g)
+                            </label>
+                            {{ form.fiber_per_100g }}
+                            {% if form.fiber_per_100g.errors %}
+                                <div class="text-danger">{{ form.fiber_per_100g.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.serving_size_g.id_for_label }}" class="form-label">
+                                <i class="bi bi-rulers text-primary"></i> Common Serving Size (g)
+                            </label>
+                            {{ form.serving_size_g }}
+                            <div class="form-text">e.g., 100g, 150g for an apple, 30g for chips</div>
+                            {% if form.serving_size_g.errors %}
+                                <div class="text-danger">{{ form.serving_size_g.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'food_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Add Food
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-question-circle"></i> Tips for Adding Foods</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-lightbulb"></i> Accuracy Tips:</h6>
+                        <ul>
+                            <li>Use nutrition labels from food packages</li>
+                            <li>Check multiple sources for accuracy</li>
+                            <li>All values should be per 100g</li>
+                            <li>Double-check your decimal points</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-search"></i> Good Sources:</h6>
+                        <ul>
+                            <li>USDA FoodData Central</li>
+                            <li>Product packaging labels</li>
+                            <li>Nutrition databases</li>
+                            <li>Restaurant nutritional information</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Remember:</strong> All nutritional values are per 100g. This makes it easy to calculate 
+                    portions when logging food consumption.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
