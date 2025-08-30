@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Quick Log - Food Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-lightning-charge"></i> Quick Log Food</h3>
+                <p class="mb-0">Log your food consumption quickly and easily</p>
+            </div>
+            <div class="card-body">
+                <form method="post" id="quickLogForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.food_name.id_for_label }}" class="form-label">Food Name</label>
+                        {{ form.food_name }}
+                        <div class="form-text">Start typing to search for foods in our database</div>
+                        <div id="foodSuggestions" class="list-group position-absolute" style="z-index: 1000; display: none;"></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.quantity_g.id_for_label }}" class="form-label">Quantity (grams)</label>
+                                {{ form.quantity_g }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.meal_type.id_for_label }}" class="form-label">Meal Type</label>
+                                {{ form.meal_type }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Log Food
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-question-circle"></i> Quick Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Search:</strong> Start typing a food name to see suggestions from our database</li>
+                    <li><strong>Quantity:</strong> Enter the weight in grams (e.g., 100g for a medium apple)</li>
+                    <li><strong>Meal Type:</strong> Select when you consumed this food</li>
+                    <li><strong>Can't find a food?</strong> <a href="{% url 'add_food' %}">Add it to our database</a> first!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const foodNameInput = document.getElementById('id_food_name');
+    const suggestionsDiv = document.getElementById('foodSuggestions');
+    let timeoutId;
+
+    foodNameInput.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        timeoutId = setTimeout(() => {
+            fetch(`{% url 'food_search_api' %}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestionsDiv.innerHTML = '';
+                    
+                    if (data.foods && data.foods.length > 0) {
+                        data.foods.forEach(food => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'list-group-item list-group-item-action';
+                            suggestion.innerHTML = `
+                                <div class="d-flex justify-content-between">
+                                    <span>${food.name}</span>
+                                    <small class="text-muted">${food.calories_per_100g} cal/100g</small>
+                                </div>
+                            `;
+                            suggestion.addEventListener('click', function() {
+                                foodNameInput.value = food.name;
+                                suggestionsDiv.style.display = 'none';
+                            });
+                            suggestionsDiv.appendChild(suggestion);
+                        });
+                        suggestionsDiv.style.display = 'block';
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching food suggestions:', error);
+                    suggestionsDiv.style.display = 'none';
+                });
+        }, 300);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!foodNameInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

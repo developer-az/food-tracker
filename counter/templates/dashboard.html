@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Food Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-speedometer2"></i> Your Dashboard</h1>
+    <div>
+        <a href="{% url 'quick_log' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Quick Log
+        </a>
+        <a href="{% url 'weekly_summary' %}" class="btn btn-outline-primary">
+            <i class="bi bi-graph-up"></i> Weekly View
+        </a>
+    </div>
+</div>
+
+<!-- Today's Summary -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-calendar-today"></i> Today's Nutrition - {{ today|date:"F d, Y" }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-primary">{{ today_totals.calories|floatformat:0 }}</h4>
+                            <small class="text-muted">/ {{ goal.daily_calories|floatformat:0 }} calories</small>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-primary" style="width: {{ progress.calories|default:0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-success">{{ today_totals.protein|floatformat:1 }}g</h4>
+                            <small class="text-muted">/ {{ goal.daily_protein|floatformat:1 }}g protein</small>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-success" style="width: {{ progress.protein|default:0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning">{{ today_totals.carbs|floatformat:1 }}g</h4>
+                            <small class="text-muted">/ {{ goal.daily_carbs|floatformat:1 }}g carbs</small>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-warning" style="width: {{ progress.carbs|default:0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info">{{ today_totals.fat|floatformat:1 }}g</h4>
+                            <small class="text-muted">/ {{ goal.daily_fat|floatformat:1 }}g fat</small>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-info" style="width: {{ progress.fat|default:0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meals Breakdown -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock"></i> Today's Meals</h5>
+            </div>
+            <div class="card-body">
+                {% for meal_name, entries in meals.items %}
+                    <div class="meal-section">
+                        <h6 class="text-capitalize">
+                            {% if meal_name == 'breakfast' %}<i class="bi bi-sunrise"></i>{% endif %}
+                            {% if meal_name == 'lunch' %}<i class="bi bi-sun"></i>{% endif %}
+                            {% if meal_name == 'dinner' %}<i class="bi bi-moon-stars"></i>{% endif %}
+                            {% if meal_name == 'snack' %}<i class="bi bi-cookie"></i>{% endif %}
+                            {{ meal_name|title }}
+                            <span class="badge bg-secondary">{{ entries.count }} item{{ entries.count|pluralize }}</span>
+                        </h6>
+                        {% if entries %}
+                            {% for entry in entries %}
+                                <div class="food-entry">
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>{{ entry.food.name }}</strong></span>
+                                        <span class="text-muted">{{ entry.quantity_g }}g</span>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ entry.calories_consumed|floatformat:0 }} cal, 
+                                        {{ entry.protein_consumed|floatformat:1 }}g protein
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted mb-0">No {{ meal_name }} logged yet</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <!-- Quick Actions -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'quick_log' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Quick Log Food
+                    </a>
+                    <a href="{% url 'add_food' %}" class="btn btn-outline-success">
+                        <i class="bi bi-plus-square"></i> Add New Food
+                    </a>
+                    <a href="{% url 'goals_settings' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-target"></i> Update Goals
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Entries -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Recent Entries</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_entries %}
+                    {% for entry in recent_entries %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ entry.food.name }}</strong><br>
+                                <small class="text-muted">
+                                    {{ entry.quantity_g }}g • {{ entry.consumed_at|date:"M d, g:i A" }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="badge bg-primary">{{ entry.calories_consumed|floatformat:0 }} cal</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'entries_history' %}" class="btn btn-sm btn-outline-primary">View All History</a>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No entries yet. Start logging your food!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Goals Status -->
+{% if progress %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-trophy"></i> Goal Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if progress.calories >= 100 %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> Calorie goal achieved! Great job!
+                            </div>
+                        {% elif progress.calories >= 80 %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> Almost there! Only {{ goal.daily_calories|floatformat:0|add:today_totals.calories|floatformat:0|sub:goal.daily_calories|floatformat:0 }} calories to go.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Keep going! You're {{ progress.calories|floatformat:0 }}% toward your calorie goal.
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if progress.protein >= 100 %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> Protein goal smashed! 💪
+                            </div>
+                        {% elif progress.protein >= 80 %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> Almost there! Need {{ goal.daily_protein|sub:today_totals.protein|floatformat:1 }}g more protein.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Focus on protein! You're at {{ progress.protein|floatformat:0 }}% of your goal.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

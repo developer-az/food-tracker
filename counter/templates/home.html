@@ -1,1 +1,155 @@
-<h1>Hello world</h1>
+{% extends 'base.html' %}
+
+{% block title %}Food Tracker - Revolutionary Food Tracking{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded">
+            <h1 class="display-4">🥗 Welcome to Food Tracker</h1>
+            <p class="lead">Revolutionary food tracking for your health journey. Monitor nutrition, achieve goals, and transform your relationship with food.</p>
+            {% if not user.is_authenticated %}
+                <hr class="my-4">
+                <p>Join thousands of users already tracking their nutrition and achieving their health goals!</p>
+                <a class="btn btn-light btn-lg" href="{% url 'register' %}" role="button">
+                    <i class="bi bi-person-plus"></i> Start Your Journey
+                </a>
+                <a class="btn btn-outline-light btn-lg ms-2" href="{% url 'login' %}" role="button">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+            {% else %}
+                <a class="btn btn-light btn-lg" href="{% url 'dashboard' %}" role="button">
+                    <i class="bi bi-speedometer2"></i> Go to Dashboard
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-5">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-search display-4 text-primary mb-3"></i>
+                <h5 class="card-title">Smart Food Search</h5>
+                <p class="card-text">Find foods quickly with our intelligent search system and extensive database.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-graph-up display-4 text-success mb-3"></i>
+                <h5 class="card-title">Progress Tracking</h5>
+                <p class="card-text">Monitor your daily nutrition intake and track progress toward your health goals.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-heart-pulse display-4 text-danger mb-3"></i>
+                <h5 class="card-title">Health Analytics</h5>
+                <p class="card-text">Get insights into your eating patterns with detailed nutritional analytics.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-target display-4 text-warning mb-3"></i>
+                <h5 class="card-title">Goal Setting</h5>
+                <p class="card-text">Set personalized nutritional goals and track your achievement over time.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+{% if total_foods > 0 %}
+<div class="row mb-5">
+    <div class="col-lg-6">
+        <div class="stats-card">
+            <h3>{{ total_foods }}</h3>
+            <p>Foods in Database</p>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-star"></i> Recently Added Foods</h5>
+            </div>
+            <div class="card-body">
+                {% for food in recent_foods %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ food.name }}</span>
+                        <span class="badge bg-primary">{{ food.calories_per_100g }} cal/100g</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Revolutionary Features Section -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2 class="text-center mb-4">🚀 Revolutionary Features</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-lightning-charge"></i> Quick Logging
+                        </h5>
+                        <p class="card-text">Log your meals in seconds with our streamlined quick-log feature. No more tedious data entry!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">
+                            <i class="bi bi-cpu"></i> Nutritional Intelligence
+                        </h5>
+                        <p class="card-text">Automatically calculate macros, micros, and get intelligent recommendations based on your goals.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">
+                            <i class="bi bi-calendar-week"></i> Weekly Analytics
+                        </h5>
+                        <p class="card-text">View comprehensive weekly summaries to understand your eating patterns and trends.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+{% if not user.is_authenticated %}
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="card bg-light">
+            <div class="card-body py-5">
+                <h3>Ready to revolutionize your nutrition?</h3>
+                <p class="lead">Join our community and start tracking your food intake today!</p>
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="bi bi-rocket-takeoff"></i> Get Started Now
+                </a>
+                <a href="{% url 'food_list' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-eye"></i> Browse Foods
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
